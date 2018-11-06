@@ -3,7 +3,7 @@
 
 # Python 输入
 # raw_input():括号中为提示的内容,去掉结尾的换行符
-str = raw_input("say something: ")
+str = input("say something: ")
 # print str
 
 # input():input会假设你的输入是一个有效的Python表达式，并返回运算结果。
@@ -36,10 +36,10 @@ fo = open("filetest.py", "a")
 
 # file.close():关闭文件
 ########
-print "Name of the file: ", fo.name
-print "Closed or not : ", fo.closed
-print "Opening mode : ", fo.mode
-print "Softspace flag : ", fo.softspace  # 如果用print输出后，必须跟一个空格符，则返回false。否则返回true。
+print("Name of the file: ", fo.name)
+print("Closed or not : ", fo.closed)
+print("Opening mode : ", fo.mode)
+# python3已经去除 print("Softspace flag : ", fo.softspace)  # 如果用print输出后，必须跟一个空格符，则返回false。否则返回true。
 
 # write():写入文件
 fo.write("ooooooooo\nxxxxxxxx\n")
@@ -47,13 +47,13 @@ fo.write("ooooooooo\nxxxxxxxx\n")
 # read():读取文件中的某一行
 fo = open("Python_Study7.py", "r")
 str = fo.read(4)
-print str
+print(str)
 
 # tell():当前光标所在位置，seek():移动光标所在位置
 fo.tell()
 fo.seek(6)
 str = fo.read(fo.tell())
-print str
+print(str)
 
 # os模块
 # 重命名和删除文件
@@ -64,7 +64,7 @@ os.remove("newfiletest.py")
 # mkdir:在当前目录创建文件夹
 # os.mkdir("xxx")#如果已经存在会报错
 # getcwd()方法显示当前的工作目录。
-print os.getcwd()
+print(os.getcwd())
 # chdir()方法 :改变当前目录,该目录必须存在
 # os.chdir("/Users/a1234/PycharmProjects/python/test")
 
@@ -87,14 +87,22 @@ try:
     fh = open("testfile", "w")
     fh.write("This is my test file for exception handling!!")
 except IOError:
-    print "Error: can\'t find file or read data"
+    print("Error: can\'t find file or read data")
 else:
-    print "Written content in the file successfully"
+    print("Written content in the file successfully")
     fh.close()
 
 try:
-    x =1 / 0
+    x = 1 / 0
 except:
-    print "math_error"
+    print()
 finally:
-    print "go on"
+    print("go on")
+
+# python3:
+try:
+    y = 1 / 0
+except ZeroDivisionError as e:
+    print("catch")
+finally:
+    print("....")

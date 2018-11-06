@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+import operator
 # 类型转换
 print(float(1000000000))
 # str:转换会去掉换行符
@@ -256,4 +257,4 @@ print(dic.setdefault("E", "NULL"))
 print(dic)
 
 mlist2 = ("D", "E", "F", "G")
-print(cmp(mlist, mlist2))
+print(operator.concat(mlist, mlist2))

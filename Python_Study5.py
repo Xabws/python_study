@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+from imp import reload
 
 """
 定义一个函数
@@ -12,15 +13,15 @@
 
 
 def mprint(string):
-    print string
+    print(string)
 
 
 mprint("hello Python");
 
 
 def person(name, age):
-    print "name:", name
-    print "age:", age
+    print("name:", name)
+    print("age:", age)
 
 
 person(18, "lily")
@@ -28,8 +29,8 @@ person(age=18, name="ff")  # 与传入顺序无关
 
 
 def person2(name, age=16):  # age不传时设置为缺省
-    print "name:", name
-    print "age:", age
+    print("name:", name)
+    print("age:", age)
 
 
 person2(name="qqq")
@@ -41,10 +42,10 @@ person2(name="qqq")
 # 可写函数说明
 def printinfo(arg1, *vartuple):
     "打印任何传入的参数"
-    print "输出: "
-    print arg1
+    print("输出: ")
+    print(arg1)
     for var in vartuple:
-        print var
+        print(var)
 
 
 # 调用printinfo 函数
@@ -53,7 +54,7 @@ printinfo(70, 60, 50)
 
 # 匿名函数
 msum = lambda arg1, arg2: arg1 + arg2
-print "sum:", msum(10, 15)
+print("sum:", msum(10, 15))
 
 
 # return 只需在函数中使用return即可
@@ -61,34 +62,37 @@ def multiply(x, y):
     return x * y
 
 
-print  multiply(4, 6)
+print(multiply(4, 6))
 
 # Python模块
 # 模块就是一个保存了Python代码的文件。模块能定义函数，类和变量。模块里也能包含可执行的代码。相当于类
 # import :倒入其他模块，一个模块只会被导入一次
 import Python_Study1
 
-print Python_Study1.xxx(56, 65)
+print(Python_Study1.xxx(56, 65))
 # 只引用部分：
 from Python_Study1 import xxx
 
-print xxx(4, 2)
+print(xxx(4, 2))
 
 # Python会先查找局部变量后查找全局变量，要想使用全局变量，在使用时加上global
 Money = 2000
+
+
 def AddMoney():
     global Money
 
+
 Money = Money + 1
 
-print Money
+print(Money)
 AddMoney()
-print Money
+print(Money)
 
-#dir(模块名)将一个模块的所有模块，变量和函数名放在一个list中
-print dir(Python_Study1)
+# dir(模块名)将一个模块的所有模块，变量和函数名放在一个list中
+print(dir(Python_Study1))
 
-#globals()和locals()函数
+# globals()和locals()函数
 """
 根据调用地方的不同，globals()和locals()函数可被用来返回全局和局部命名空间里的名字。
 如果在函数内部调用locals()，返回的是所有能在该函数里访问的命名。
@@ -96,11 +100,7 @@ print dir(Python_Study1)
 两个函数的返回类型都是字典。所以名字们能用keys()函数摘取。
 """
 
-#reload:reload()函数
-#当一个模块被导入到一个脚本，模块顶层部分的代码只会被执行一次。
-#因此，如果你想重新执行模块里顶层部分的代码，可以用reload()函数。该函数会重新导入之前导入过的模块。语法如下：
+# reload:reload()函数
+# 当一个模块被导入到一个脚本，模块顶层部分的代码只会被执行一次。
+# 因此，如果你想重新执行模块里顶层部分的代码，可以用reload()函数。该函数会重新导入之前导入过的模块。语法如下：
 reload(Python_Study1)
-
-
-
-
