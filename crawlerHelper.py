@@ -22,6 +22,8 @@ class CrawlerHelper:
 
     def __init__(self):
         self.url = "https://www.gamersky.com/ent/wp/"
+        # 全局file变量，文件写入操作对象
+        self.file = open("wallpaper.txt", "wb")
 
     # 移除多余内容
     def replace(self, x):
@@ -35,14 +37,17 @@ class CrawlerHelper:
         # strip()将前后多余内容删除
         return x.strip()
 
+    # 写入所有壁纸链接到文件
     def selectContent(self, x):
         print(type(x))
         for link in x:
             if link.get('title') != None:
-            
                 print(link.get('title'))
                 print(link.get('href'))
-
+                self.file.write("\n".encode())
+                self.file.write(link.get('title').encode('utf-8'))
+                self.file.write(link.get('href').encode('utf-8'))
+    # 打开链接
     def viewPage(self):
         request = urllib.request.Request(self.url)
         response = urllib.request.urlopen(request)
@@ -54,8 +59,6 @@ class CrawlerHelper:
         # 查找所有超文本链接
         content = soup.find_all('a')
         self.selectContent(content)
-        # print(soup.find_all('a'))
-        # print(self.replace(content))
 
 
 crawlerhelper = CrawlerHelper()
