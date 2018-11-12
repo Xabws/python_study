@@ -1,5 +1,6 @@
 import urllib.request
 import re
+import string
 from bs4 import BeautifulSoup  # 用于解析网页
 
 
@@ -34,6 +35,14 @@ class CrawlerHelper:
         # strip()将前后多余内容删除
         return x.strip()
 
+    def selectContent(self, x):
+        print(type(x))
+        for link in x:
+            if link.get('title') != None:
+            
+                print(link.get('title'))
+                print(link.get('href'))
+
     def viewPage(self):
         request = urllib.request.Request(self.url)
         response = urllib.request.urlopen(request)
@@ -42,8 +51,9 @@ class CrawlerHelper:
 
     def getContent(self, content):
         soup = BeautifulSoup(content)
-        #查找所有超文本链接
+        # 查找所有超文本链接
         content = soup.find_all('a')
+        self.selectContent(content)
         # print(soup.find_all('a'))
         # print(self.replace(content))
 
