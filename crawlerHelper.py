@@ -1,6 +1,8 @@
 import urllib.request
 import re
 import string
+import os
+import time
 from bs4 import BeautifulSoup  # 用于解析网页
 
 
@@ -42,14 +44,17 @@ class CrawlerHelper:
         print(type(x))
         for link in x:
             if link.get('title') != None:
-                wallpaperbean = WallpaperBean(link.get('title'), link.get('href'))
+                url = link.get('href')
+                if ("https://www.gamersky.com" not in link.get('href')):
+                    url = "https://www.gamersky.com" + link.get('href')
+                wallpaperbean = WallpaperBean(link.get('title'), url)
                 self.urlList.append(wallpaperbean)
                 # print(link.get('title'))
                 # print(link.get('href'))
                 self.file.write("\n".encode())
                 self.file.write(link.get('title').encode('utf-8'))
                 self.file.write("\n".encode())
-                self.file.write(link.get('href').encode('utf-8'))
+                self.file.write(url.encode('utf-8'))
         print(self.urlList)
         return self.urlList
 
@@ -78,26 +83,27 @@ class WallpaperBean(object):
         return "title, " + self.title + "url, " + self.url
 
 
-# 单页的解析
-class GamerSkyParse:
+# 每一期的解析
+class GamerSkyParsePhase:
     def __init__(self, title, url):
         self.url = url
         self.title = title
         self.file = open("wallPaperList.txt", "wb")
+        self.urlList = []
 
     # 打开子链接
     def viewPageUrl(self):
         request = urllib.request.Request(self.url)
         response = urllib.request.urlopen(request)
         content = response.read().decode('utf-8')
-        self.getContentUrl(content)
+        return self.getContentUrl(content)
 
     # 查找子目录
     def getContentUrl(self, content):
         soup = BeautifulSoup(content)
         # 查找所有超文本链接
         content = soup.find_all('a')
-        self.selectContentUrl(content)
+        return self.selectContentUrl(content)
 
     def selectContentUrl(self, x):
         # 截取字符串最后一个"/"后面的内容（包含最后一个"/"）：/1122337.shtml
@@ -111,15 +117,62 @@ class GamerSkyParse:
             # bs4.element.tag类型转换成String
             wallpaperUrl = str(tag)
             if (self.url in wallpaperUrl) & ("href" in wallpaperUrl):
-                print(tag['href'])
-                print(tag.text)
-                self.file.write("\n".encode())
-                self.file.write(tag['href'].encode('utf-8'))
-                self.file.write("\n".encode())
-                self.file.write(tag.text.encode('utf-8'))
+                if ("_" in tag['href']):
+                    wallpaperbean = WallpaperBean(tag.text, tag['href'])
+                    self.urlList.append(wallpaperbean)
+                    # print(tag['href'])
+                    # print(tag.text)
+                    self.file.write("\n".encode())
+                    self.file.write(tag['href'].encode('utf-8'))
+                    self.file.write("\n".encode())
+                    self.file.write(tag.text.encode('utf-8'))
+        return self.urlList
 
+
+# 每期中每页的解析
+class GamerSkyParsePage:
+    def __init__(self, url):
+        self.url = url
+        self.list =[]
+        self.saveUrl = "/Users/a1234/parse"
+
+    # 打开子链接
+    def viewPageUrl(self):
+        request = urllib.request.Request(self.url)
+        response = urllib.request.urlopen(request)
+        content = response.read().decode('utf-8')
+        self.parsePage(content)
+
+    # 该页中壁纸链接以picact类为标示的<img>标签
+    def parsePage(self, content):
+        soup = BeautifulSoup(content)
+        # 查找所有以picact类为标示超文本链接
+        content = soup.find_all("img", class_="picact")
+        for url in content:
+            self.list.append(url['src'])
+            print(self.list)
+            # 使用Python中的urllib类中的urlretrieve()函数，直接从网上下载资源到本地
+            try:
+                # 是否有这个路径
+                if not os.path.exists(self.saveUrl):
+                    # 创建路径
+                    os.makedirs(self.saveUrl)
+                # 拼接图片名（包含路径）
+
+                filename = self.saveUrl+"/"+url['src'].split('/')[-1]
+                print(filename)
+                # 下载图片，并保存到文件夹中
+                urllib.request.urlretrieve(url['src'], filename=filename)
+
+            except IOError as e:
+                print("IOError")
+            except Exception as e:
+                print("Exception")
 
 crawlerhelper = CrawlerHelper()
 url = crawlerhelper.viewPage()
-gamerSkyParse = GamerSkyParse(url[0].title, url[0].url)
-gamerSkyParse.viewPageUrl()
+gamerSkyParsePhase = GamerSkyParsePhase(url[0].title, url[0].url)
+urllist = gamerSkyParsePhase.viewPageUrl()
+for wallpaper in urllist:
+    gamerSkyParsePage = GamerSkyParsePage(wallpaper.url)
+    gamerSkyParsePage.viewPageUrl()
