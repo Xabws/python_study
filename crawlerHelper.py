@@ -7,38 +7,11 @@ from bs4 import BeautifulSoup  # 用于解析网页
 
 
 class CrawlerHelper:
-    # 去除img标签,7位长空格
-    removeImg = re.compile('<img.*?>| {7}|')
-    # 删除超链接标签
-    removeAddr = re.compile('<a.*?>|</a>')
-    # 把换行的标签换为\n
-    replaceLine = re.compile('<tr>|<div>|</div>|</p>')
-    # 将表格制表<td>替换为\t
-    replaceTD = re.compile('<td>')
-    # 把段落开头换为\n加空两格
-    replacePara = re.compile('<p.*?>')
-    # 将换行符或双换行符替换为\n
-    replaceBR = re.compile('<br><br>|<br>')
-    # 将其余标签剔除
-    removeExtraTag = re.compile('<.*?>')
-
     def __init__(self):
         self.url = "https://www.gamersky.com/ent/wp/"
         # 全局file变量，文件写入操作对象
         self.file = open("wallpaperTotal.txt", "wb")
         self.urlList = []
-
-    # 移除多余内容
-    def replace(self, x):
-        x = re.sub(self.removeImg, "", x)
-        x = re.sub(self.removeAddr, "", x)
-        x = re.sub(self.replaceLine, "\n", x)
-        x = re.sub(self.replaceTD, "\t", x)
-        x = re.sub(self.replacePara, "\n    ", x)
-        x = re.sub(self.replaceBR, "\n", x)
-        x = re.sub(self.removeExtraTag, "", x)
-        # strip()将前后多余内容删除
-        return x.strip()  # 写入所有壁纸链接到文件
 
     def selectContent(self, x):
         print(type(x))
@@ -116,25 +89,22 @@ class GamerSkyParsePhase:
             # print(type(tag))
             # bs4.element.tag类型转换成String
             wallpaperUrl = str(tag)
-            if (self.url in wallpaperUrl) & ("href" in wallpaperUrl):
-                if ("_" in tag['href']):
-                    wallpaperbean = WallpaperBean(tag.text, tag['href'])
-                    self.urlList.append(wallpaperbean)
-                    # print(tag['href'])
-                    # print(tag.text)
-                    self.file.write("\n".encode())
-                    self.file.write(tag['href'].encode('utf-8'))
-                    self.file.write("\n".encode())
-                    self.file.write(tag.text.encode('utf-8'))
-        return self.urlList
+            if (self.url in wallpaperUrl) & ("href" in wallpaperUrl) & ("javascript" not in wallpaperUrl) & (
+                        wallpaperUrl not in self.urlList):
+                self.urlList.append(tag['href'])
+                self.file.write("\n".encode())
+                self.file.write(tag['href'].encode('utf-8'))
+                self.file.write("\n".encode())
+                self.file.write(tag.text.encode('utf-8'))
+        return self.urlList  # 每期中每页的解析
 
 
-# 每期中每页的解析
 class GamerSkyParsePage:
-    def __init__(self, url):
+    def __init__(self, url, maintitle):
         self.url = url
         self.list = []
-        self.saveUrl = "/Users/a1234/parse"
+        maintitle = maintitle[0:maintitle.find("：")]
+        self.saveUrl = "/Users/a1234/parse/" + maintitle
 
     # 打开子链接
     def viewPageUrl(self):
@@ -153,7 +123,7 @@ class GamerSkyParsePage:
             if ("showimage" in wallpaperUrl):
                 # https://www.gamersky.com/showimage/id_gamersky.shtml?http://img1.gamersky.com/image2018/11/20181111_ddw_459_8/gamersky_09origin_17_2018111112307A0.jpg
                 # 截取？之后的url则为大图url
-                wpurl =  url['href'][ url['href'].rfind("http:"):]
+                wpurl = url['href'][url['href'].rfind("http:"):]
                 self.list.append(wpurl)
                 print(wpurl)
                 # 使用Python中的urllib类中的urlretrieve()函数，直接从网上下载资源到本地
@@ -199,6 +169,6 @@ crawlerhelper = CrawlerHelper()
 url = crawlerhelper.viewPage()
 gamerSkyParsePhase = GamerSkyParsePhase(url[0].title, url[0].url)
 urllist = gamerSkyParsePhase.viewPageUrl()
-for wallpaper in urllist:
-    gamerSkyParsePage = GamerSkyParsePage(wallpaper.url)
+for url in urllist:
+    gamerSkyParsePage = GamerSkyParsePage(url, gamerSkyParsePhase.title)
     gamerSkyParsePage.viewPageUrl()
