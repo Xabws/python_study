@@ -133,7 +133,7 @@ class GamerSkyParsePhase:
 class GamerSkyParsePage:
     def __init__(self, url):
         self.url = url
-        self.list =[]
+        self.list = []
         self.saveUrl = "/Users/a1234/parse"
 
     # 打开子链接
@@ -143,31 +143,57 @@ class GamerSkyParsePage:
         content = response.read().decode('utf-8')
         self.parsePage(content)
 
-    # 该页中壁纸链接以picact类为标示的<img>标签
+    # 该页中壁纸(小图)链接以picact类为标示的<img>标签，大图url中包含"showimage"字段
     def parsePage(self, content):
         soup = BeautifulSoup(content)
-        # 查找所有以picact类为标示超文本链接
-        content = soup.find_all("img", class_="picact")
-        for url in content:
-            self.list.append(url['src'])
-            print(self.list)
-            # 使用Python中的urllib类中的urlretrieve()函数，直接从网上下载资源到本地
-            try:
-                # 是否有这个路径
-                if not os.path.exists(self.saveUrl):
-                    # 创建路径
-                    os.makedirs(self.saveUrl)
-                # 拼接图片名（包含路径）
 
-                filename = self.saveUrl+"/"+url['src'].split('/')[-1]
-                print(filename)
-                # 下载图片，并保存到文件夹中
-                urllib.request.urlretrieve(url['src'], filename=filename)
+        a = soup.find_all("a")
+        for url in a:
+            wallpaperUrl = str(url)
+            if ("showimage" in wallpaperUrl):
+                # https://www.gamersky.com/showimage/id_gamersky.shtml?http://img1.gamersky.com/image2018/11/20181111_ddw_459_8/gamersky_09origin_17_2018111112307A0.jpg
+                # 截取？之后的url则为大图url
+                wpurl =  url['href'][ url['href'].rfind("http:"):]
+                self.list.append(wpurl)
+                print(wpurl)
+                # 使用Python中的urllib类中的urlretrieve()函数，直接从网上下载资源到本地
+                try:
+                    # 是否有这个路径
+                    if not os.path.exists(self.saveUrl):
+                        # 创建路径
+                        os.makedirs(self.saveUrl)
+                    # 拼接图片名（包含路径）
 
-            except IOError as e:
-                print("IOError")
-            except Exception as e:
-                print("Exception")
+                    filename = self.saveUrl + "/" + wpurl.split('/')[-1]
+                    print(filename)
+                    # 下载图片，并保存到文件夹中
+                    urllib.request.urlretrieve(wpurl, filename=filename)
+
+                except IOError as e:
+                    print("IOError")
+                except Exception as e:
+                    print("Exception")
+                    # for url in content:
+                    #     self.list.append(url['src'])
+                    #     print(self.list)
+                    #     # 使用Python中的urllib类中的urlretrieve()函数，直接从网上下载资源到本地
+                    #     try:
+                    #         # 是否有这个路径
+                    #         if not os.path.exists(self.saveUrl):
+                    #             # 创建路径
+                    #             os.makedirs(self.saveUrl)
+                    #         # 拼接图片名（包含路径）
+                    #
+                    #         filename = self.saveUrl + "/" + url['src'].split('/')[-1]
+                    #         print(filename)
+                    #         # 下载图片，并保存到文件夹中
+                    #         urllib.request.urlretrieve(url['src'], filename=filename)
+                    #
+                    #     except IOError as e:
+                    #         print("IOError")
+                    #     except Exception as e:
+                    #         print("Exception")
+
 
 crawlerhelper = CrawlerHelper()
 url = crawlerhelper.viewPage()
