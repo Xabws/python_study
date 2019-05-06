@@ -40,7 +40,7 @@ class CrawlerHelper:
 
     # 查找总目录
     def getContent(self, content):
-        soup = BeautifulSoup(content)
+        soup = BeautifulSoup(content,"lxml")
         # 查找所有超文本链接
         content = soup.find_all('a')
         return self.selectContent(content)
@@ -73,7 +73,7 @@ class GamerSkyParsePhase:
 
     # 查找子目录
     def getContentUrl(self, content):
-        soup = BeautifulSoup(content)
+        soup = BeautifulSoup(content,"lxml")
         # 查找所有超文本链接
         content = soup.find_all('a')
         return self.selectContentUrl(content)
@@ -104,7 +104,7 @@ class GamerSkyParsePage:
         self.url = url
         self.list = []
         maintitle = maintitle[0:maintitle.find("：")]
-        self.saveUrl = "/Users/a1234/parse/" + maintitle
+        self.saveUrl = "/Users/wsbai/parse/" + maintitle
 
     # 打开子链接
     def viewPageUrl(self):
@@ -115,15 +115,15 @@ class GamerSkyParsePage:
 
     # 该页中壁纸(小图)链接以picact类为标示的<img>标签，大图url中包含"showimage"字段
     def parsePage(self, content):
-        soup = BeautifulSoup(content)
+        soup = BeautifulSoup(content,"lxml")
 
         a = soup.find_all("a")
         for url in a:
             wallpaperUrl = str(url)
             if ("showimage" in wallpaperUrl):
-                # https://www.gamersky.com/showimage/id_gamersky.shtml?http://img1.gamersky.com/image2018/11/20181111_ddw_459_8/gamersky_09origin_17_2018111112307A0.jpg
+                # https://www.gamersky.com/showimage/id_gamersky.shtml?https://img1.gamersky.com/image2019/04/20190427_ljt_red_220_3/gamersky_001origin_001_201942716489B7.jpg"
                 # 截取？之后的url则为大图url
-                wpurl = url['href'][url['href'].rfind("http:"):]
+                wpurl = url['href'][url['href'].rfind("https:"):]
                 self.list.append(wpurl)
                 print(wpurl)
                 # 使用Python中的urllib类中的urlretrieve()函数，直接从网上下载资源到本地
